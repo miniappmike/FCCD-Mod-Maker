@@ -4,6 +4,6 @@ import tailwindcss from "@tailwindcss/vite";
 
 export default defineConfig({
   plugins: [react(), tailwindcss()],
-  base: "/fccd-custom-universe-editor/",
+  base: "/FCCD-Mod-Maker/",
 });
 
