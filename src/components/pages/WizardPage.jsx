@@ -70,7 +70,7 @@ function BasicsStep({ universe, updateField, issueCount }) {
   );
 }
 
-function ConferencesStep({ universe, setView, updateField, issueCount }) {
+function ConferencesStep({ universe, setView, updateField, issueCount, poolCount }) {
   const conferences = universe.conferences || [];
   return (
     <StepShell
@@ -86,6 +86,9 @@ function ConferencesStep({ universe, setView, updateField, issueCount }) {
           Open Realignment Board
         </button>
       </div>
+      {poolCount > 0 ? (
+        <div className="text-xs text-amber-400">{poolCount} team(s) still waiting in the pool, unassigned to any conference.</div>
+      ) : null}
       <div className="space-y-2">
         {conferences.map((conf, cIdx) => {
           const teamCounts = (conf.divisions || []).map((d) => (d.teams || []).length);
@@ -272,7 +275,7 @@ const STEP_LABELS = {
 };
 
 export default function WizardPage() {
-  const { universe, setView, updateField, validation, assetAudit } = useUniverse();
+  const { universe, setView, updateField, validation, assetAudit, teamPool } = useUniverse();
   const [stepIdx, setStepIdx] = useState(0);
   const rows = useMemo(() => flattenTeams(universe), [universe]);
   const step = STEPS[stepIdx];
@@ -316,7 +319,7 @@ export default function WizardPage() {
       <div className="rounded-xl border border-slate-800 bg-slate-900/40 p-5">
         {step === "basics" ? <BasicsStep universe={universe} updateField={updateField} issueCount={issueCounts.basics} /> : null}
         {step === "conferences" ? (
-          <ConferencesStep universe={universe} setView={setView} updateField={updateField} issueCount={issueCounts.conferences} />
+          <ConferencesStep universe={universe} setView={setView} updateField={updateField} issueCount={issueCounts.conferences} poolCount={teamPool.length} />
         ) : null}
         {step === "rivalries" ? <RivalriesStep rows={rows} setView={setView} issueCount={issueCounts.rivalries} /> : null}
         {step === "bowls" ? <BowlsStep universe={universe} setView={setView} issueCount={issueCounts.bowls} /> : null}
