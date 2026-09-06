@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { setAt, deleteAt, removeArrayItem, insertArrayItem, moveArrayItem, safeJsonParse, getUnknownEntries } from "../jsonUtils.js";
+import { setAt, deleteAt, removeArrayItem, insertArrayItem, moveArrayItem, safeJsonParse } from "../jsonUtils.js";
 
 describe("setAt", () => {
   it("updates a nested field without mutating the original object", () => {
@@ -62,23 +62,5 @@ describe("safeJsonParse", () => {
   it("handles a completely empty string", () => {
     const result = safeJsonParse("");
     expect(result.ok).toBe(false);
-  });
-});
-
-describe("getUnknownEntries", () => {
-  it("returns only keys not in the known set, preserving unusual values", () => {
-    const entity = { name: "Alabama", mascot: "Tide", customFlag: true, meta: { x: 1 }, arr: [1, null] };
-    const known = new Set(["name", "mascot"]);
-    const unknown = getUnknownEntries(entity, known);
-    expect(unknown).toEqual([
-      ["customFlag", true],
-      ["meta", { x: 1 }],
-      ["arr", [1, null]]
-    ]);
-  });
-
-  it("returns an empty array for non-object entities", () => {
-    expect(getUnknownEntries(null, new Set())).toEqual([]);
-    expect(getUnknownEntries([1, 2], new Set())).toEqual([]);
   });
 });

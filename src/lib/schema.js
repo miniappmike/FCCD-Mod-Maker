@@ -1,9 +1,6 @@
-/*** Data-driven schema definitions for the FC:CD custom universe format.
- * This is the single source of truth for which JSON fields the visual
- * editor understands. Anything on a real entity that is NOT listed here
- * is treated as an "advanced / unknown" field: preserved, shown, and
- * editable, but never silently discarded. Do not invent fields that are
- * not backed by hardlimitations.md / the existing format. ***/
+/*** Shared constants, defaults, and small helpers for the FC:CD custom
+ * universe format. Field names/shapes here are the ones actually observed
+ * in real universe files (see hardlimitations.md) — nothing invented. ***/
 
 export const ARCHETYPE_OPTIONS = [
   "academic-focused",
@@ -35,45 +32,6 @@ export const ATTRIBUTE_FIELDS = [
 
 export const ATTRIBUTE_KEYS = new Set(ATTRIBUTE_FIELDS.map((f) => f.key));
 
-export const TEAM_FIELDS = [
-  { key: "abbreviation", label: "Abbreviation", type: "text", description: "Short unique code for the team. Must be unique across the entire universe." },
-  { key: "name", label: "Team Name", type: "text", description: "The team's school/city name. Used to match Images/Teams/{name}.png." },
-  { key: "mascot", label: "Mascot", type: "text", description: "The team's mascot/nickname (e.g. \"Crimson Tide\")." },
-  { key: "primaryColor", label: "Primary Color", type: "color", description: "Primary brand color, hex #RRGGBB." },
-  { key: "secondaryColor", label: "Secondary Color", type: "color", description: "Secondary brand color, hex #RRGGBB." },
-  { key: "zipcode", label: "Zip Code", type: "zip", description: "5-digit ZIP code of the team's home location." },
-  { key: "attributes", label: "Attributes", type: "attributes", description: "Team ratings; all 1-10 except attendance." },
-  { key: "archetype", label: "Archetype", type: "select", options: ARCHETYPE_OPTIONS, description: "The team's campus/program identity archetype." },
-  { key: "fanbaseType", label: "Fanbase Type", type: "select", options: FANBASE_TYPE_OPTIONS, description: "How the fanbase reacts to program performance." },
-  { key: "rivalAbbreviation", label: "Rival", type: "rival", description: "Abbreviation of this team's rival. Must exist and be in the same division." }
-];
-
-export const TEAM_KNOWN_KEYS = new Set(TEAM_FIELDS.map((f) => f.key));
-
-export const DIVISION_FIELDS = [
-  { key: "name", label: "Division Name", type: "text", description: "Name of the division within its conference." },
-  { key: "teams", label: "Teams", type: "teamArray", description: "Teams belonging to this division." }
-];
-export const DIVISION_KNOWN_KEYS = new Set(DIVISION_FIELDS.map((f) => f.key));
-
-export const CONFERENCE_FIELDS = [
-  { key: "name", label: "Conference Name", type: "text", description: "Conference name. Used to match Images/Conferences/{name}.png." },
-  { key: "prestigeLevel", label: "Prestige Level", type: "range", min: 1, max: 10, description: "1-10; must be unique across every conference in the universe (required for realignment)." },
-  { key: "zipcode", label: "Zip Code", type: "zip", description: "5-digit ZIP code of where the conference championship game is played." },
-  { key: "divisions", label: "Divisions", type: "divisionArray", description: "Single division of 10 teams, 2 divisions of 6/7/9, or 4 divisions of 4/5." },
-  { key: "playCcgIndoors", label: "CCG Played Indoors", type: "boolean", description: "Whether the conference championship game venue is indoors." },
-  { key: "playCcgAsHomeGame", label: "CCG At Higher Seed's Home", type: "boolean", description: "Play the championship game at the higher seed's home stadium instead of a neutral site." }
-];
-export const CONFERENCE_KNOWN_KEYS = new Set(CONFERENCE_FIELDS.map((f) => f.key));
-
-export const BOWL_FIELDS = [
-  { key: "name", label: "Bowl Name", type: "text", description: "Bowl game name. Used to match Images/Bowls/{name}.png." },
-  { key: "zipcode", label: "Zip Code", type: "zip", description: "5-digit ZIP code of where the bowl is played." },
-  { key: "indoors", label: "Indoors", type: "boolean", description: "Whether the bowl is played in an indoor/domed venue." },
-  { key: "tieIn", label: "Tie-In", type: "tieIn", description: "Optional conference tie-in(s); up to 5 conferences per side." }
-];
-export const BOWL_KNOWN_KEYS = new Set(BOWL_FIELDS.map((f) => f.key));
-
 // The 16 award slots observed in real universe files. A loaded file may omit some of
 // these or include additional ones — both are handled: known slots get labeled rows,
 // anything else still shows up (LeagueSettingsPage merges present keys with this list).
@@ -95,37 +53,6 @@ export const LEAGUE_AWARD_SLOTS = [
   { key: "top-rs", label: "Top Returner" },
   { key: "coty", label: "Coach of the Year" }
 ];
-export const LEAGUE_AWARD_KNOWN_KEYS = new Set(LEAGUE_AWARD_SLOTS.map((s) => s.key));
-
-export const OOC_RIVALRY_FIELDS = [
-  { key: "teamA", label: "Team A", type: "teamRef", description: "Abbreviation of the first team in the rivalry." },
-  { key: "teamB", label: "Team B", type: "teamRef", description: "Abbreviation of the second team in the rivalry." },
-  { key: "preferredSlot", label: "Preferred Slot", type: "number", description: "Preferred week slot for scheduling this rivalry." },
-  { key: "offset", label: "Offset", type: "number", description: "Scheduling offset used alongside cadence." },
-  { key: "cadence", label: "Cadence", type: "number", description: "How often (in years) the rivalry is scheduled." }
-];
-export const OOC_RIVALRY_KNOWN_KEYS = new Set(OOC_RIVALRY_FIELDS.map((f) => f.key));
-
-export const NEUTRAL_SITE_FIELDS = [
-  { key: "zipcode", label: "Zip Code", type: "zip", description: "5-digit ZIP code of the neutral playoff site." },
-  { key: "indoors", label: "Indoors", type: "boolean", description: "Whether the site is an indoor/domed venue." }
-];
-export const NEUTRAL_SITE_KNOWN_KEYS = new Set(NEUTRAL_SITE_FIELDS.map((f) => f.key));
-
-export const UNIVERSE_FIELDS = [
-  { key: "name", label: "Universe Name", type: "text", description: "Name of the custom universe/mod." },
-  { key: "startingYear", label: "Starting Year", type: "number", description: "The year the save/universe begins." },
-  { key: "startingMessage", label: "Starting Message", type: "textarea", description: "Flavor text shown at the start of the save." },
-  // Intentionally not exposed in any editor (per product decision) — listed here only so it
-  // stays a "known" field (preserved, not surfaced in Advanced/Other Fields) rather than editable.
-  { key: "adjustHsGradYears", label: "Adjust HS Grad Years", type: "boolean", hidden: true, description: "Whether recruit high-school graduation years are auto-adjusted." },
-  { key: "conferences", label: "Conferences", type: "conferenceArray", description: "Exactly 6, 8, or 10 conferences." },
-  { key: "bowlGames", label: "Bowl Games", type: "bowlArray", description: "Bowl games, ordered by importance." },
-  { key: "oocRivalries", label: "Out-of-Conference Rivalries", type: "oocRivalryArray", description: "Scheduled rivalries between teams outside their conference." },
-  { key: "playoffNeutralSites", label: "Playoff Neutral Sites", type: "neutralSiteArray", description: "Neutral-site venues used for playoff rounds." },
-  { key: "leagueAwardNames", label: "League Award Names", type: "awardMap", description: "Display name and abbreviation for each league award." }
-];
-export const UNIVERSE_KNOWN_KEYS = new Set(UNIVERSE_FIELDS.map((f) => f.key));
 
 export const defaultAttributes = () => ({
   prestige: 1,

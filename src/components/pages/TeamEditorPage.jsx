@@ -1,10 +1,9 @@
 import React from "react";
 import { useUniverse } from "../../context/UniverseContext.jsx";
-import { ATTRIBUTE_FIELDS, ARCHETYPE_OPTIONS, FANBASE_TYPE_OPTIONS, TEAM_KNOWN_KEYS, getTeamDisplayName } from "../../lib/schema.js";
+import { ATTRIBUTE_FIELDS, ARCHETYPE_OPTIONS, FANBASE_TYPE_OPTIONS, getTeamDisplayName } from "../../lib/schema.js";
 import { matchTeamAsset } from "../../lib/assetSummary.js";
 import ColorField from "../shared/ColorField.jsx";
 import ZipLocationField from "../shared/ZipLocationField.jsx";
-import AdvancedFieldsEditor from "../shared/AdvancedFieldsEditor.jsx";
 import AssetThumb from "../shared/AssetThumb.jsx";
 import UploadAssetModal from "../shared/UploadAssetModal.jsx";
 import ConfirmButton from "../shared/ConfirmButton.jsx";
@@ -12,7 +11,7 @@ import BrandingCard from "./BrandingCard.jsx";
 import { useState } from "react";
 
 export default function TeamEditorPage() {
-  const { universe, view, setView, updateField, deleteField, removeAt, moveTeam } = useUniverse();
+  const { universe, view, setView, updateField, removeAt, moveTeam } = useUniverse();
   const { cIdx, dIdx, tIdx } = view.params;
   const [uploadOpen, setUploadOpen] = useState(false);
 
@@ -196,13 +195,6 @@ export default function TeamEditorPage() {
         </div>
         <p className="mt-2 text-xs text-slate-500">Moving a team keeps every field intact — only its position in the conference/division tree changes.</p>
       </div>
-
-      <AdvancedFieldsEditor
-        entity={team}
-        knownKeys={TEAM_KNOWN_KEYS}
-        onSet={(key, val) => updateField(path(key), val)}
-        onDelete={(key) => deleteField(path(key))}
-      />
 
       <div className="flex justify-end border-t border-slate-800 pt-4">
         <ConfirmButton
