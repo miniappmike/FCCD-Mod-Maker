@@ -1,19 +1,30 @@
-import React from "react";
+import React, { useMemo, useState } from "react";
 import { useUniverse } from "../../context/UniverseContext.jsx";
 import { ATTRIBUTE_FIELDS, ARCHETYPE_OPTIONS, FANBASE_TYPE_OPTIONS, getTeamDisplayName } from "../../lib/schema.js";
 import { matchTeamAsset } from "../../lib/assetSummary.js";
+import { flattenTeams } from "../../lib/teamStats.js";
 import ColorField from "../shared/ColorField.jsx";
 import ZipLocationField from "../shared/ZipLocationField.jsx";
 import AssetThumb from "../shared/AssetThumb.jsx";
 import UploadAssetModal from "../shared/UploadAssetModal.jsx";
 import ConfirmButton from "../shared/ConfirmButton.jsx";
 import BrandingCard from "./BrandingCard.jsx";
-import { useState } from "react";
 
 export default function TeamEditorPage() {
   const { universe, view, setView, updateField, removeAt, moveTeam } = useUniverse();
   const { cIdx, dIdx, tIdx } = view.params;
   const [uploadOpen, setUploadOpen] = useState(false);
+
+  const allTeams = useMemo(() => flattenTeams(universe), [universe]);
+  const teamsByConference = useMemo(() => {
+    const map = new Map();
+    allTeams.forEach((r) => {
+      const key = r.confName || "(unnamed conference)";
+      if (!map.has(key)) map.set(key, []);
+      map.get(key).push(r);
+    });
+    return map;
+  }, [allTeams]);
 
   const conf = universe.conferences?.[cIdx];
   const div = conf?.divisions?.[dIdx];
@@ -53,9 +64,32 @@ export default function TeamEditorPage() {
 
   return (
     <div id={`team-${cIdx}-${dIdx}-${tIdx}`} className="mx-auto max-w-4xl space-y-6 p-6">
-      <button type="button" className="text-xs text-cyan-400 hover:underline" onClick={() => setView("teams")}>
-        ← Back to Teams
-      </button>
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <button type="button" className="text-xs text-cyan-400 hover:underline" onClick={() => setView("teams")}>
+          ← Back to Teams
+        </button>
+        <label className="flex items-center gap-2 text-xs text-slate-400">
+          Switch team
+          <select
+            className="rounded-md border border-slate-700 bg-slate-950 px-2 py-1.5 text-sm text-slate-100"
+            value={`${cIdx}-${dIdx}-${tIdx}`}
+            onChange={(e) => {
+              const [nc, nd, nt] = e.target.value.split("-").map(Number);
+              setView("team", { cIdx: nc, dIdx: nd, tIdx: nt });
+            }}
+          >
+            {[...teamsByConference.entries()].map(([confName, rows]) => (
+              <optgroup key={confName} label={confName}>
+                {rows.map((r) => (
+                  <option key={`${r.cIdx}-${r.dIdx}-${r.tIdx}`} value={`${r.cIdx}-${r.dIdx}-${r.tIdx}`}>
+                    {getTeamDisplayName(r.team)}
+                  </option>
+                ))}
+              </optgroup>
+            ))}
+          </select>
+        </label>
+      </div>
 
       <BrandingCard team={team} logoUrl={match.asset?.url} />
 

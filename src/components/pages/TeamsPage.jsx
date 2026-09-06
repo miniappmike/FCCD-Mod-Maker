@@ -2,19 +2,8 @@ import React, { useMemo, useState } from "react";
 import { useUniverse } from "../../context/UniverseContext.jsx";
 import { ARCHETYPE_OPTIONS, FANBASE_TYPE_OPTIONS } from "../../lib/schema.js";
 import { matchTeamAsset } from "../../lib/assetSummary.js";
+import { flattenTeams } from "../../lib/teamStats.js";
 import TeamCard from "./TeamCard.jsx";
-
-function flattenTeams(universe) {
-  const rows = [];
-  (universe.conferences || []).forEach((conf, cIdx) => {
-    (conf.divisions || []).forEach((div, dIdx) => {
-      (div.teams || []).forEach((team, tIdx) => {
-        rows.push({ team, cIdx, dIdx, tIdx, confName: conf.name, divName: div.name, prestige: team?.attributes?.prestige });
-      });
-    });
-  });
-  return rows;
-}
 
 export default function TeamsPage() {
   const { universe, setUniverse, setView, validation } = useUniverse();

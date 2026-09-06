@@ -3,21 +3,10 @@ import { useUniverse } from "../../context/UniverseContext.jsx";
 import { getTeamDisplayName } from "../../lib/schema.js";
 import { countAssetWarnings } from "../../lib/assetSummary.js";
 import { downloadJsonFile, copyJsonToClipboard } from "../../lib/exportUtils.js";
+import { flattenTeams } from "../../lib/teamStats.js";
 import StatusPill from "../shared/StatusPill.jsx";
 import StructureAssistant from "./StructureAssistant.jsx";
 import RealignmentGrid from "./RealignmentGrid.jsx";
-
-function flattenTeams(universe) {
-  const rows = [];
-  (universe.conferences || []).forEach((conf, cIdx) => {
-    (conf.divisions || []).forEach((div, dIdx) => {
-      (div.teams || []).forEach((team, tIdx) => {
-        rows.push({ team, cIdx, dIdx, tIdx, confName: conf.name, divName: div.name });
-      });
-    });
-  });
-  return rows;
-}
 
 function StepShell({ title, description, issueCount, children }) {
   return (
