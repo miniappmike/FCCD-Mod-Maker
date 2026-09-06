@@ -1,20 +1,17 @@
 /*** Conference division-structure suggestions, derived directly from the
- * hard-limitation rules: a single division of 10, 2 divisions each 6/7/9,
- * or 4 divisions each 4/5. Given how many teams a conference currently
- * has, this proposes the exact division-size combinations that would make
- * it valid, plus the nearest achievable totals if none fit exactly. ***/
+ * hard-limitation rules: a single division of 10, 2 divisions of equal
+ * size (6+6, 7+7, or 9+9), or 4 divisions of equal size (all 4s or all
+ * 5s) — the game validates on these exact per-conference totals, so a
+ * mismatched split like 6+7 (totaling 13) is invalid even though 6 and 7
+ * are each individually allowed sizes. Given how many teams a conference
+ * currently has, this proposes the exact division-size combinations that
+ * would make it valid, plus the nearest achievable totals if none fit
+ * exactly. ***/
 
-const TWO_DIV_SIZES = [6, 7, 9];
-const FOUR_DIV_COUNT = 4;
-const FOUR_DIV_SIZES = [4, 5];
+import { TWO_DIV_SIZES, FOUR_DIV_SIZES } from "./conferenceStructure.js";
 
 function fourDivisionCombos() {
-  const combos = [];
-  for (let fours = 0; fours <= FOUR_DIV_COUNT; fours++) {
-    const fives = FOUR_DIV_COUNT - fours;
-    combos.push({ sizes: [...Array(fours).fill(4), ...Array(fives).fill(5)], total: fours * 4 + fives * 5 });
-  }
-  return combos;
+  return FOUR_DIV_SIZES.map((size) => ({ sizes: Array(4).fill(size), total: size * 4 }));
 }
 
 export function suggestStructures(totalTeams) {
@@ -24,11 +21,9 @@ export function suggestStructures(totalTeams) {
     suggestions.push({ sizes: [10], label: "1 division of 10" });
   }
 
-  for (const a of TWO_DIV_SIZES) {
-    for (const b of TWO_DIV_SIZES) {
-      if (a <= b && a + b === totalTeams) {
-        suggestions.push({ sizes: [a, b], label: `2 divisions: ${a} + ${b}` });
-      }
+  for (const size of TWO_DIV_SIZES) {
+    if (size * 2 === totalTeams) {
+      suggestions.push({ sizes: [size, size], label: `2 divisions: ${size} + ${size}` });
     }
   }
 
@@ -43,7 +38,7 @@ export function suggestStructures(totalTeams) {
 
 export function nearestAchievableTotals(totalTeams, count = 4) {
   const achievable = new Set([10]);
-  for (const a of TWO_DIV_SIZES) for (const b of TWO_DIV_SIZES) achievable.add(a + b);
+  for (const size of TWO_DIV_SIZES) achievable.add(size * 2);
   fourDivisionCombos().forEach(({ total }) => achievable.add(total));
 
   return [...achievable]

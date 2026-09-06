@@ -1,17 +1,16 @@
 import React from "react";
 import { useUniverse } from "../../context/UniverseContext.jsx";
-
-const VALID_COUNTS_BY_STRUCTURE = { 1: [10], 2: [6, 7, 9], 4: [4, 5] };
+import { isValidConferenceStructure } from "../../lib/conferenceStructure.js";
 
 export default function DivisionsPage() {
   const { universe, setView } = useUniverse();
   const rows = [];
   (universe.conferences || []).forEach((conf, cIdx) => {
-    const divCount = (conf.divisions || []).length;
-    (conf.divisions || []).forEach((div, dIdx) => {
+    const divisions = conf.divisions || [];
+    const valid = isValidConferenceStructure(divisions);
+    divisions.forEach((div, dIdx) => {
       const teamCount = (div.teams || []).length;
-      const allowed = VALID_COUNTS_BY_STRUCTURE[divCount] || [];
-      rows.push({ cIdx, dIdx, confName: conf.name, divName: div.name, teamCount, valid: allowed.includes(teamCount) });
+      rows.push({ cIdx, dIdx, confName: conf.name, divName: div.name, teamCount, valid });
     });
   });
 
