@@ -116,7 +116,9 @@ export const UNIVERSE_FIELDS = [
   { key: "name", label: "Universe Name", type: "text", description: "Name of the custom universe/mod." },
   { key: "startingYear", label: "Starting Year", type: "number", description: "The year the save/universe begins." },
   { key: "startingMessage", label: "Starting Message", type: "textarea", description: "Flavor text shown at the start of the save." },
-  { key: "adjustHsGradYears", label: "Adjust HS Grad Years", type: "boolean", description: "Whether recruit high-school graduation years are auto-adjusted." },
+  // Intentionally not exposed in any editor (per product decision) — listed here only so it
+  // stays a "known" field (preserved, not surfaced in Advanced/Other Fields) rather than editable.
+  { key: "adjustHsGradYears", label: "Adjust HS Grad Years", type: "boolean", hidden: true, description: "Whether recruit high-school graduation years are auto-adjusted." },
   { key: "conferences", label: "Conferences", type: "conferenceArray", description: "Exactly 6, 8, or 10 conferences." },
   { key: "bowlGames", label: "Bowl Games", type: "bowlArray", description: "Bowl games, ordered by importance." },
   { key: "oocRivalries", label: "Out-of-Conference Rivalries", type: "oocRivalryArray", description: "Scheduled rivalries between teams outside their conference." },

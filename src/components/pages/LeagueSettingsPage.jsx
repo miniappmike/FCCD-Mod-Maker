@@ -90,16 +90,6 @@ export default function LeagueSettingsPage() {
         <p className="text-sm text-slate-500">Universe-wide settings that aren't tied to a specific team, conference, or bowl.</p>
       </div>
 
-      <div className="rounded-lg border border-slate-800 bg-slate-900/60 p-4">
-        <BooleanField
-          id="adjust-hs-grad-years"
-          label="Adjust HS Grad Years"
-          description="Whether recruit high-school graduation years are auto-adjusted."
-          value={universe.adjustHsGradYears}
-          onChange={(v) => updateField(["adjustHsGradYears"], v)}
-        />
-      </div>
-
       <NeutralSitesEditor universe={universe} updateField={updateField} insertAt={insertAt} removeAt={removeAt} />
       <AwardNamesEditor universe={universe} updateField={updateField} />
     </div>

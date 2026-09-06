@@ -164,9 +164,8 @@ function BowlsStep({ universe, setView, issueCount }) {
 function LeagueStep({ universe, setView, issueCount }) {
   const filledAwards = Object.values(universe.leagueAwardNames || {}).filter((a) => a?.name && a?.abbreviation).length;
   return (
-    <StepShell title="League Settings" description="Award names, playoff neutral sites, and HS grad-year adjustment." issueCount={issueCount}>
+    <StepShell title="League Settings" description="Award names and playoff neutral sites." issueCount={issueCount}>
       <ul className="space-y-1 text-sm text-slate-300">
-        <li>Adjust HS Grad Years: <span className="font-medium">{universe.adjustHsGradYears ? "On" : "Off"}</span></li>
         <li>Playoff neutral sites: <span className="font-medium">{(universe.playoffNeutralSites || []).length}</span></li>
         <li>Award names filled in: <span className="font-medium">{filledAwards} / {Object.keys(universe.leagueAwardNames || {}).length}</span></li>
       </ul>
