@@ -131,4 +131,28 @@ describe("validateUniverseDetailed", () => {
     expect(validateUniverseDetailed(null)).toEqual([]);
     expect(() => validateUniverseDetailed({})).not.toThrow();
   });
+
+  it("flags an out-of-conference rivalry referencing an unknown team", () => {
+    const u = makeValidUniverse();
+    u.oocRivalries = [{ teamA: "C0T0", teamB: "NOT-REAL", preferredSlot: 1, offset: 0, cadence: 1 }];
+    expect(validateUniverseDetailed(u).some((e) => e.message.includes("unknown team 'NOT-REAL'"))).toBe(true);
+  });
+
+  it("flags an out-of-conference rivalry using the same team on both sides", () => {
+    const u = makeValidUniverse();
+    u.oocRivalries = [{ teamA: "C0T0", teamB: "C0T0", preferredSlot: 1, offset: 0, cadence: 1 }];
+    expect(validateUniverseDetailed(u).some((e) => e.message.includes("cannot use the same team"))).toBe(true);
+  });
+
+  it("allows a valid out-of-conference rivalry between two real teams", () => {
+    const u = makeValidUniverse();
+    u.oocRivalries = [{ teamA: "C0T0", teamB: "C1T0", preferredSlot: 1, offset: 0, cadence: 1 }];
+    expect(validateUniverseDetailed(u).some((e) => e.category === "rivals" && e.message.includes("C0T0"))).toBe(false);
+  });
+
+  it("requires a 5-digit zipcode for playoff neutral sites", () => {
+    const u = makeValidUniverse();
+    u.playoffNeutralSites = [{ zipcode: "abc", indoors: true }];
+    expect(validateUniverseDetailed(u).some((e) => e.message.includes("neutral site #1 must have a 5-digit zipcode"))).toBe(true);
+  });
 });

@@ -13,6 +13,9 @@ import ConferenceEditorPage from "./pages/ConferenceEditorPage.jsx";
 import DivisionsPage from "./pages/DivisionsPage.jsx";
 import BowlsPage from "./pages/BowlsPage.jsx";
 import RealignmentBoard from "./pages/RealignmentBoard.jsx";
+import RivalriesPage from "./pages/RivalriesPage.jsx";
+import LeagueSettingsPage from "./pages/LeagueSettingsPage.jsx";
+import WizardPage from "./pages/WizardPage.jsx";
 import AssetsPage from "./pages/AssetsPage.jsx";
 import ValidationPage from "./pages/ValidationPage.jsx";
 import JsonPage from "./pages/JsonPage.jsx";
@@ -26,6 +29,9 @@ const TITLES = {
   realignment: "Realignment Board",
   divisions: "Divisions",
   bowls: "Bowl Games",
+  rivalries: "Rivalries",
+  "league-settings": "League Settings",
+  wizard: "Setup Wizard",
   assets: "Asset Manager",
   validation: "Validation",
   json: "Raw JSON Editor"
@@ -50,6 +56,12 @@ function CurrentPage() {
       return <DivisionsPage />;
     case "bowls":
       return <BowlsPage />;
+    case "rivalries":
+      return <RivalriesPage />;
+    case "league-settings":
+      return <LeagueSettingsPage />;
+    case "wizard":
+      return <WizardPage />;
     case "assets":
       return <AssetsPage />;
     case "validation":

@@ -8,6 +8,8 @@ const NAV_ITEMS = [
   { name: "conferences", label: "Conferences", icon: "🏆" },
   { name: "divisions", label: "Divisions", icon: "▤" },
   { name: "bowls", label: "Bowls", icon: "🎗" },
+  { name: "rivalries", label: "Rivalries", icon: "⚔" },
+  { name: "league-settings", label: "League Settings", icon: "⚙" },
   { name: "assets", label: "Assets", icon: "🖼" },
   { name: "validation", label: "Validation", icon: "✓" },
   { name: "json", label: "JSON", icon: "{ }" }
@@ -23,6 +25,21 @@ export default function Sidebar() {
       <div className="flex items-center gap-2 border-b border-slate-800 px-4 py-4">
         <span className="text-lg font-bold tracking-tight text-cyan-400">FCC:D</span>
         <span className="text-xs font-semibold uppercase tracking-widest text-slate-500">Mod Maker</span>
+      </div>
+
+      <div className="p-2">
+        <button
+          type="button"
+          onClick={() => setView("wizard")}
+          aria-current={view.name === "wizard" ? "page" : undefined}
+          className={`flex w-full items-center justify-center gap-2 rounded-md px-3 py-2 text-sm font-semibold transition-colors ${
+            view.name === "wizard"
+              ? "bg-cyan-500 text-slate-950"
+              : "bg-cyan-500/15 text-cyan-300 hover:bg-cyan-500/25"
+          }`}
+        >
+          <span aria-hidden="true">✨</span> Setup Wizard
+        </button>
       </div>
 
       <ul className="flex-1 space-y-0.5 overflow-y-auto p-2">

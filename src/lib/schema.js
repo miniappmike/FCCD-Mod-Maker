@@ -60,33 +60,80 @@ export const CONFERENCE_FIELDS = [
   { key: "name", label: "Conference Name", type: "text", description: "Conference name. Used to match Images/Conferences/{name}.png." },
   { key: "prestigeLevel", label: "Prestige Level", type: "range", min: 1, max: 10, description: "1-10; must be unique across every conference in the universe (required for realignment)." },
   { key: "zipcode", label: "Zip Code", type: "zip", description: "5-digit ZIP code of where the conference championship game is played." },
-  { key: "divisions", label: "Divisions", type: "divisionArray", description: "Single division of 10 teams, 2 divisions of 6/7/9, or 4 divisions of 4/5." }
+  { key: "divisions", label: "Divisions", type: "divisionArray", description: "Single division of 10 teams, 2 divisions of 6/7/9, or 4 divisions of 4/5." },
+  { key: "playCcgIndoors", label: "CCG Played Indoors", type: "boolean", description: "Whether the conference championship game venue is indoors." },
+  { key: "playCcgAsHomeGame", label: "CCG At Higher Seed's Home", type: "boolean", description: "Play the championship game at the higher seed's home stadium instead of a neutral site." }
 ];
 export const CONFERENCE_KNOWN_KEYS = new Set(CONFERENCE_FIELDS.map((f) => f.key));
 
 export const BOWL_FIELDS = [
   { key: "name", label: "Bowl Name", type: "text", description: "Bowl game name. Used to match Images/Bowls/{name}.png." },
   { key: "zipcode", label: "Zip Code", type: "zip", description: "5-digit ZIP code of where the bowl is played." },
+  { key: "indoors", label: "Indoors", type: "boolean", description: "Whether the bowl is played in an indoor/domed venue." },
   { key: "tieIn", label: "Tie-In", type: "tieIn", description: "Optional conference tie-in(s); up to 5 conferences per side." }
 ];
 export const BOWL_KNOWN_KEYS = new Set(BOWL_FIELDS.map((f) => f.key));
+
+// The 16 award slots observed in real universe files. A loaded file may omit some of
+// these or include additional ones — both are handled: known slots get labeled rows,
+// anything else still shows up (LeagueSettingsPage merges present keys with this list).
+export const LEAGUE_AWARD_SLOTS = [
+  { key: "poty", label: "Player of the Year" },
+  { key: "dpoty", label: "Defensive Player of the Year" },
+  { key: "foty", label: "Freshman/Feature Player of the Year" },
+  { key: "top-qb", label: "Top Quarterback" },
+  { key: "top-rb", label: "Top Running Back" },
+  { key: "top-wr", label: "Top Wide Receiver" },
+  { key: "top-te", label: "Top Tight End" },
+  { key: "top-ol", label: "Top Offensive Lineman" },
+  { key: "top-k", label: "Top Kicker" },
+  { key: "top-p", label: "Top Punter" },
+  { key: "top-dl", label: "Top Defensive Lineman" },
+  { key: "top-lb", label: "Top Linebacker" },
+  { key: "top-cb", label: "Top Cornerback" },
+  { key: "top-s", label: "Top Safety" },
+  { key: "top-rs", label: "Top Returner" },
+  { key: "coty", label: "Coach of the Year" }
+];
+export const LEAGUE_AWARD_KNOWN_KEYS = new Set(LEAGUE_AWARD_SLOTS.map((s) => s.key));
+
+export const OOC_RIVALRY_FIELDS = [
+  { key: "teamA", label: "Team A", type: "teamRef", description: "Abbreviation of the first team in the rivalry." },
+  { key: "teamB", label: "Team B", type: "teamRef", description: "Abbreviation of the second team in the rivalry." },
+  { key: "preferredSlot", label: "Preferred Slot", type: "number", description: "Preferred week slot for scheduling this rivalry." },
+  { key: "offset", label: "Offset", type: "number", description: "Scheduling offset used alongside cadence." },
+  { key: "cadence", label: "Cadence", type: "number", description: "How often (in years) the rivalry is scheduled." }
+];
+export const OOC_RIVALRY_KNOWN_KEYS = new Set(OOC_RIVALRY_FIELDS.map((f) => f.key));
+
+export const NEUTRAL_SITE_FIELDS = [
+  { key: "zipcode", label: "Zip Code", type: "zip", description: "5-digit ZIP code of the neutral playoff site." },
+  { key: "indoors", label: "Indoors", type: "boolean", description: "Whether the site is an indoor/domed venue." }
+];
+export const NEUTRAL_SITE_KNOWN_KEYS = new Set(NEUTRAL_SITE_FIELDS.map((f) => f.key));
 
 export const UNIVERSE_FIELDS = [
   { key: "name", label: "Universe Name", type: "text", description: "Name of the custom universe/mod." },
   { key: "startingYear", label: "Starting Year", type: "number", description: "The year the save/universe begins." },
   { key: "startingMessage", label: "Starting Message", type: "textarea", description: "Flavor text shown at the start of the save." },
+  // Intentionally not exposed in any editor (per product decision) — listed here only so it
+  // stays a "known" field (preserved, not surfaced in Advanced/Other Fields) rather than editable.
+  { key: "adjustHsGradYears", label: "Adjust HS Grad Years", type: "boolean", hidden: true, description: "Whether recruit high-school graduation years are auto-adjusted." },
   { key: "conferences", label: "Conferences", type: "conferenceArray", description: "Exactly 6, 8, or 10 conferences." },
-  { key: "bowlGames", label: "Bowl Games", type: "bowlArray", description: "Bowl games, ordered by importance." }
+  { key: "bowlGames", label: "Bowl Games", type: "bowlArray", description: "Bowl games, ordered by importance." },
+  { key: "oocRivalries", label: "Out-of-Conference Rivalries", type: "oocRivalryArray", description: "Scheduled rivalries between teams outside their conference." },
+  { key: "playoffNeutralSites", label: "Playoff Neutral Sites", type: "neutralSiteArray", description: "Neutral-site venues used for playoff rounds." },
+  { key: "leagueAwardNames", label: "League Award Names", type: "awardMap", description: "Display name and abbreviation for each league award." }
 ];
 export const UNIVERSE_KNOWN_KEYS = new Set(UNIVERSE_FIELDS.map((f) => f.key));
 
 export const defaultAttributes = () => ({
-  stadium: 1,
+  prestige: 1,
   facilities: 1,
+  stadium: 1,
   collegeLife: 1,
   academics: 1,
   marketing: 1,
-  prestige: 1,
   attendance: 0,
   fanbaseLevel: 1
 });
@@ -115,12 +162,23 @@ export const makeDefaultConference = () => ({
 
 export const makeDefaultBowl = () => ({ name: "New Bowl", zipcode: "00000" });
 
+export const makeDefaultOocRivalry = () => ({ teamA: "", teamB: "", preferredSlot: 1, offset: 0, cadence: 1 });
+
+export const makeDefaultNeutralSite = () => ({ zipcode: "00000", indoors: false });
+
+export const makeDefaultLeagueAwardNames = () =>
+  Object.fromEntries(LEAGUE_AWARD_SLOTS.map((s) => [s.key, { name: "", abbreviation: "" }]));
+
 export const makeBlankUniverse = () => ({
   name: "New Universe",
   startingYear: new Date().getFullYear(),
   startingMessage: "",
+  adjustHsGradYears: false,
   conferences: [],
-  bowlGames: []
+  bowlGames: [],
+  oocRivalries: [],
+  playoffNeutralSites: [],
+  leagueAwardNames: makeDefaultLeagueAwardNames()
 });
 
 export function getTeamDisplayName(team) {

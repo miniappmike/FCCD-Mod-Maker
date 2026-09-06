@@ -1,42 +1,6 @@
 import React, { useRef } from "react";
 import { useUniverse } from "../context/UniverseContext.jsx";
-
-function downloadJsonFile(universe) {
-  const json = JSON.stringify(universe, null, 2);
-  const rawName = String(universe?.name ?? "custom-universe").trim();
-  const safeName =
-    rawName
-      .replace(/[^\w\s-]/g, "")
-      .replace(/\s+/g, "-")
-      .slice(0, 60) || "custom-universe";
-  const filename = `${safeName}.json`;
-  const blob = new Blob([json], { type: "application/json" });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement("a");
-  a.href = url;
-  a.download = filename;
-  document.body.appendChild(a);
-  a.click();
-  document.body.removeChild(a);
-  URL.revokeObjectURL(url);
-}
-
-async function copyJsonToClipboard(universe) {
-  const json = JSON.stringify(universe, null, 2);
-  if (navigator?.clipboard?.writeText) {
-    await navigator.clipboard.writeText(json);
-    return;
-  }
-  const ta = document.createElement("textarea");
-  ta.value = json;
-  ta.style.position = "fixed";
-  ta.style.left = "-9999px";
-  document.body.appendChild(ta);
-  ta.focus();
-  ta.select();
-  document.execCommand("copy");
-  document.body.removeChild(ta);
-}
+import { downloadJsonFile, copyJsonToClipboard } from "../lib/exportUtils.js";
 
 export default function BottomBar() {
   const { universe, importJson, markSaved, isDirty, validation, setView, showToast } = useUniverse();

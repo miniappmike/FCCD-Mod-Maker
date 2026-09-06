@@ -230,6 +230,41 @@ export function validateUniverseDetailed(universe) {
     }
   });
 
+  // Out-of-conference rivalries: both teams must exist and be distinct.
+  const oocRivalries = Array.isArray(universe.oocRivalries) ? universe.oocRivalries : [];
+  oocRivalries.forEach((r, i) => {
+    const targetId = "section-rivalries";
+    const a = String(r?.teamA ?? "").trim();
+    const b = String(r?.teamB ?? "").trim();
+    const label = a && b ? `${a} vs ${b}` : `#${i + 1}`;
+
+    if (!a || !b) {
+      errors.push({ message: `Out-of-conference rivalry ${label} needs both teamA and teamB.`, targetId, category: "rivals" });
+      return;
+    }
+    if (a === b) {
+      errors.push({ message: `Out-of-conference rivalry '${label}' cannot use the same team on both sides.`, targetId, category: "rivals" });
+    }
+    if (!globalAbbrevSet.has(a)) {
+      errors.push({ message: `Out-of-conference rivalry '${label}' references unknown team '${a}'.`, targetId, category: "rivals" });
+    }
+    if (!globalAbbrevSet.has(b)) {
+      errors.push({ message: `Out-of-conference rivalry '${label}' references unknown team '${b}'.`, targetId, category: "rivals" });
+    }
+  });
+
+  // Playoff neutral sites: same 5-digit zipcode rule as bowls/conferences.
+  const playoffNeutralSites = Array.isArray(universe.playoffNeutralSites) ? universe.playoffNeutralSites : [];
+  playoffNeutralSites.forEach((site, i) => {
+    if (typeof site?.zipcode !== "string" || !/^[0-9]{5}$/.test(site.zipcode)) {
+      errors.push({
+        message: `Playoff neutral site #${i + 1} must have a 5-digit zipcode.`,
+        targetId: "section-league-settings",
+        category: "zip"
+      });
+    }
+  });
+
   return errors;
 }
 
