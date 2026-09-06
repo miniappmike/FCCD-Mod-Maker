@@ -70,8 +70,8 @@ export default function LandingPage() {
           onClick={async () => {
             setLoadingRoster(true);
             try {
-              const seeded = await loadBaseRosterUniverse();
-              startBlankUniverse(seeded);
+              const { universe: seeded, pool } = await loadBaseRosterUniverse();
+              startBlankUniverse(seeded, pool);
             } catch {
               showToast("Could not load the base roster.", "error");
             } finally {
@@ -79,11 +79,11 @@ export default function LandingPage() {
             }
           }}
         >
-          {loadingRoster ? "Loading…" : "Start from Base Roster (realign existing teams)"}
+          {loadingRoster ? "Loading…" : "Start from Base Roster (drag teams into your own conferences)"}
         </button>
         <p className="mt-1 text-center text-[11px] text-slate-600">
-          Loads a full 138-team, 10-conference roster so you can drag teams into custom conferences
-          on the Realignment Board instead of building from nothing.
+          Loads 10 real conferences with zero teams each, plus all 138 real teams in a pool — drag
+          each one into a division on the Realignment Board to build your own alignment from scratch.
         </p>
 
         <div className="mt-6 flex items-center justify-between gap-2 text-xs">

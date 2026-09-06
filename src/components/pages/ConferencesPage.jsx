@@ -15,7 +15,7 @@ function conferenceIsValid(conf) {
 }
 
 export default function ConferencesPage() {
-  const { universe, insertAt, setView } = useUniverse();
+  const { universe, insertAt, setView, teamPool } = useUniverse();
   const conferences = universe.conferences || [];
   const validCount = ![6, 8, 10].includes(conferences.length) ? null : conferences.length;
 
@@ -36,6 +36,11 @@ export default function ConferencesPage() {
             onClick={() => setView("realignment")}
           >
             Open Realignment Board
+            {teamPool.length > 0 ? (
+              <span className="ml-1.5 rounded-full bg-amber-500/20 px-1.5 py-0.5 text-[10px] font-semibold text-amber-400">
+                {teamPool.length} unassigned
+              </span>
+            ) : null}
           </button>
           <button
             type="button"
@@ -46,6 +51,15 @@ export default function ConferencesPage() {
           </button>
         </div>
       </div>
+
+      {teamPool.length > 0 ? (
+        <div className="rounded-lg border border-amber-500/30 bg-amber-500/[0.05] px-4 py-2.5 text-sm text-amber-300">
+          {teamPool.length} team{teamPool.length === 1 ? "" : "s"} waiting in the pool, unassigned to any conference.{" "}
+          <button type="button" className="font-semibold underline" onClick={() => setView("realignment")}>
+            Drag them in →
+          </button>
+        </div>
+      ) : null}
 
       <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
         {conferences.map((conf, cIdx) => {

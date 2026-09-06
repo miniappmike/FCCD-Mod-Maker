@@ -6,7 +6,8 @@ import {
   insertArrayItem,
   moveArrayItem,
   moveTeamBetweenDivisions,
-  safeJsonParse
+  safeJsonParse,
+  getAt
 } from "../lib/jsonUtils.js";
 import { validateUniverseDetailed, runValidationSelfTestsOnce } from "../lib/validation.js";
 import { buildAssetAudit } from "../lib/assetSummary.js";
@@ -14,6 +15,7 @@ import { buildSearchIndex } from "../lib/searchIndex.js";
 import { getCachedZip, lookupZip } from "../lib/zipCache.js";
 
 const AUTOSAVE_KEY = "fccd-universe-autosave-v1";
+const POOL_AUTOSAVE_KEY = "fccd-team-pool-autosave-v1";
 
 const UniverseContext = createContext(null);
 
@@ -34,6 +36,10 @@ export function UniverseProvider({ children }) {
   const [toast, setToast] = useState(null);
   const [zipInfoByZip, setZipInfoByZip] = useState({});
   const [hasAutosave, setHasAutosave] = useState(false);
+  // Teams waiting to be dragged into a conference/division on the Realignment Board. This is
+  // pure in-app scratch state, never part of the exported JSON — the game's format has no
+  // "unassigned" concept, so a team only becomes real once it's dropped into an actual division.
+  const [teamPool, setTeamPool] = useState([]);
   const selfTestsRanRef = useRef(false);
 
   if (!selfTestsRanRef.current && typeof import.meta !== "undefined" && import.meta.env?.DEV) {
@@ -53,10 +59,11 @@ export function UniverseProvider({ children }) {
     if (!universe) return;
     try {
       localStorage.setItem(AUTOSAVE_KEY, JSON.stringify(universe));
+      localStorage.setItem(POOL_AUTOSAVE_KEY, JSON.stringify(teamPool));
     } catch {
       // Best-effort only; not required for the app to function.
     }
-  }, [universe]);
+  }, [universe, teamPool]);
 
   const showToast = useCallback((message, kind = "info") => {
     setToast({ message, kind, id: Date.now() });
@@ -93,6 +100,23 @@ export function UniverseProvider({ children }) {
     []
   );
 
+  // Team Pool: teams staged for the Realignment Board that are not yet part of any
+  // conference/division in the JSON. `team` is passed in explicitly by the caller (read
+  // straight from the current render's teamPool/universe) so these two setters never need
+  // to reach into each other's state from inside an updater function.
+  const movePoolTeamToDivision = useCallback((team, poolIdx, toPath) => {
+    setUniverseRaw((prev) => {
+      const arr = getAt(prev, toPath) || [];
+      return insertArrayItem(prev, toPath, arr.length, team);
+    });
+    setTeamPool((prev) => prev.filter((_, i) => i !== poolIdx));
+  }, []);
+
+  const moveDivisionTeamToPool = useCallback((team, fromPath) => {
+    setUniverseRaw((prev) => removeArrayItem(prev, fromPath.slice(0, -1), fromPath[fromPath.length - 1]));
+    setTeamPool((prev) => [...prev, team]);
+  }, []);
+
   const importJson = useCallback(
     (text) => {
       const result = safeJsonParse(text);
@@ -102,6 +126,7 @@ export function UniverseProvider({ children }) {
       }
       setUniverseRaw(result.value);
       setSavedSnapshot(JSON.stringify(result.value));
+      setTeamPool([]);
       setView("overview");
       showToast("Universe imported.", "success");
       return true;
@@ -116,9 +141,10 @@ export function UniverseProvider({ children }) {
   }, []);
 
   const startBlankUniverse = useCallback(
-    (blank) => {
+    (blank, pool = []) => {
       setUniverseRaw(blank);
       setSavedSnapshot(null);
+      setTeamPool(pool);
       setView("overview");
     },
     [setView]
@@ -131,6 +157,12 @@ export function UniverseProvider({ children }) {
       const parsed = JSON.parse(raw);
       setUniverseRaw(parsed);
       setSavedSnapshot(null);
+      try {
+        const rawPool = localStorage.getItem(POOL_AUTOSAVE_KEY);
+        setTeamPool(rawPool ? JSON.parse(rawPool) : []);
+      } catch {
+        setTeamPool([]);
+      }
       setView("overview");
       showToast("Restored last session from this browser.", "success");
     } catch {
@@ -214,6 +246,9 @@ export function UniverseProvider({ children }) {
     insertAt,
     moveItem,
     moveTeam,
+    teamPool,
+    movePoolTeamToDivision,
+    moveDivisionTeamToPool,
     validation,
     assetAudit,
     searchIndex,
