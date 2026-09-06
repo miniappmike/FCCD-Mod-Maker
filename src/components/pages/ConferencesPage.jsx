@@ -2,6 +2,7 @@ import React from "react";
 import { useUniverse } from "../../context/UniverseContext.jsx";
 import { makeDefaultConference } from "../../lib/schema.js";
 import { matchConferenceAsset } from "../../lib/assetSummary.js";
+import { flattenConferenceTeams, averagePrestige, formatAveragePrestige } from "../../lib/teamStats.js";
 import StatusPill from "../shared/StatusPill.jsx";
 
 function conferenceIsValid(conf) {
@@ -66,6 +67,7 @@ export default function ConferencesPage() {
           const teamCount = (conf.divisions || []).reduce((s, d) => s + (d.teams || []).length, 0);
           const match = matchConferenceAsset(conf.name);
           const valid = conferenceIsValid(conf);
+          const avgPrestige = averagePrestige(flattenConferenceTeams(conf));
           return (
             <button
               id={`conf-${cIdx}`}
@@ -84,7 +86,8 @@ export default function ConferencesPage() {
                 </div>
               </div>
               <div className="text-xs text-slate-500">
-                {teamCount} teams · {(conf.divisions || []).length} division{(conf.divisions || []).length === 1 ? "" : "s"}
+                {teamCount} teams · {(conf.divisions || []).length} division{(conf.divisions || []).length === 1 ? "" : "s"} · Avg
+                Team Prestige {formatAveragePrestige(avgPrestige)}
               </div>
               <div className="flex flex-wrap gap-1.5">
                 <StatusPill status={valid ? "success" : "error"}>{valid ? "Structure OK" : "Invalid Structure"}</StatusPill>

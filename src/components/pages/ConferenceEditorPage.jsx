@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { useUniverse } from "../../context/UniverseContext.jsx";
 import { makeDefaultDivision, makeDefaultTeam, getTeamDisplayName } from "../../lib/schema.js";
 import { matchConferenceAsset } from "../../lib/assetSummary.js";
+import { flattenConferenceTeams, averagePrestige, formatAveragePrestige } from "../../lib/teamStats.js";
 import ZipLocationField from "../shared/ZipLocationField.jsx";
 import AssetThumb from "../shared/AssetThumb.jsx";
 import UploadAssetModal from "../shared/UploadAssetModal.jsx";
@@ -34,6 +35,8 @@ export default function ConferenceEditorPage() {
     (divisions.length === 1 && teamCounts[0] === 10) ||
     (divisions.length === 2 && teamCounts.every((c) => [6, 7, 9].includes(c))) ||
     (divisions.length === 4 && teamCounts.every((c) => [4, 5].includes(c)));
+  const totalTeams = teamCounts.reduce((a, b) => a + b, 0);
+  const avgPrestige = averagePrestige(flattenConferenceTeams(conf));
 
   return (
     <div id={`conf-${cIdx}`} className="mx-auto max-w-4xl space-y-6 p-6">
@@ -88,6 +91,9 @@ export default function ConferenceEditorPage() {
         <div className="mb-3 flex items-center justify-between">
           <h3 className="text-xs font-semibold uppercase tracking-wide text-slate-400">
             Divisions {structureValid ? <span className="text-emerald-400">✓ valid structure</span> : <span className="text-rose-400">⚠ invalid structure (need 1×10, 2×[6/7/9], or 4×[4/5])</span>}
+            <span className="ml-2 font-normal normal-case text-slate-500">
+              {totalTeams} team{totalTeams === 1 ? "" : "s"} · Avg Team Prestige {formatAveragePrestige(avgPrestige)}
+            </span>
           </h3>
           <button
             type="button"

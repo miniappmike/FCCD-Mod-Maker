@@ -1,20 +1,9 @@
 import React from "react";
 import { useUniverse } from "../../context/UniverseContext.jsx";
 import { makeDefaultOocRivalry, getTeamDisplayName } from "../../lib/schema.js";
+import { flattenTeams } from "../../lib/teamStats.js";
 import ConfirmButton from "../shared/ConfirmButton.jsx";
 import StatusPill from "../shared/StatusPill.jsx";
-
-function flattenTeams(universe) {
-  const rows = [];
-  (universe.conferences || []).forEach((conf, cIdx) => {
-    (conf.divisions || []).forEach((div, dIdx) => {
-      (div.teams || []).forEach((team, tIdx) => {
-        rows.push({ team, cIdx, dIdx, tIdx, confName: conf.name, divName: div.name });
-      });
-    });
-  });
-  return rows;
-}
 
 function InDivisionRivalries({ rows, setView }) {
   return (

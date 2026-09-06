@@ -1,6 +1,7 @@
 import React from "react";
 import { useUniverse } from "../../context/UniverseContext.jsx";
 import { countAssetWarnings } from "../../lib/assetSummary.js";
+import { flattenTeams, averagePrestige, formatAveragePrestige } from "../../lib/teamStats.js";
 
 function StatCard({ label, value, onClick }) {
   return (
@@ -25,6 +26,7 @@ export default function OverviewPage() {
   const confCount = (universe.conferences || []).length;
   const bowlCount = (universe.bowlGames || []).length;
   const assetWarnings = countAssetWarnings(assetAudit);
+  const worldAvgPrestige = averagePrestige(flattenTeams(universe).map((r) => r.team));
 
   return (
     <div id="section-overview" className="mx-auto max-w-4xl space-y-6 p-6">
@@ -33,11 +35,12 @@ export default function OverviewPage() {
         <p className="text-sm text-slate-500">Top-level details for your custom mod.</p>
       </div>
 
-      <div className="grid grid-cols-2 gap-4 rounded-lg border border-slate-800 bg-slate-900/40 p-4 sm:grid-cols-4">
+      <div className="grid grid-cols-2 gap-4 rounded-lg border border-slate-800 bg-slate-900/40 p-4 sm:grid-cols-3 lg:grid-cols-5">
         <StatCard label="Conferences" value={confCount} onClick={() => setView("conferences")} />
         <StatCard label="Teams" value={teamCount} onClick={() => setView("teams")} />
         <StatCard label="Bowl Games" value={bowlCount} onClick={() => setView("bowls")} />
         <StatCard label="Open Issues" value={validation.length} onClick={() => setView("validation")} />
+        <StatCard label="Avg World Prestige" value={formatAveragePrestige(worldAvgPrestige)} onClick={() => setView("teams")} />
       </div>
 
       <div className="grid gap-4 rounded-lg border border-slate-800 bg-slate-900/60 p-4 sm:grid-cols-2">
