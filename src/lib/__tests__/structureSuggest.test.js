@@ -6,14 +6,16 @@ describe("suggestStructures", () => {
     expect(suggestStructures(10)).toContainEqual({ sizes: [10], label: "1 division of 10" });
   });
 
-  it("suggests every valid 2-division combination", () => {
-    const s = suggestStructures(15); // 6+9 or 7+8(invalid, 8 not allowed) -> only 6+9
-    expect(s).toContainEqual({ sizes: [6, 9], label: "2 divisions: 6 + 9" });
+  it("suggests equal-size 2-division combinations only (game rejects mismatched sizes)", () => {
+    expect(suggestStructures(14)).toContainEqual({ sizes: [7, 7], label: "2 divisions: 7 + 7" });
+    // 13 = 6+7 is NOT suggested: the game rejects mismatched division sizes even
+    // though 6 and 7 are each individually allowed.
+    expect(suggestStructures(13)).toEqual([]);
   });
 
   it("suggests every valid 4-division combination", () => {
-    const s = suggestStructures(18); // 4+4+5+5 in some order
-    expect(s.some((x) => x.sizes.filter((n) => n === 4).length === 2 && x.sizes.filter((n) => n === 5).length === 2)).toBe(true);
+    expect(suggestStructures(16)).toContainEqual({ sizes: [4, 4, 4, 4], label: "4 divisions: 4 + 4 + 4 + 4" });
+    expect(suggestStructures(20)).toContainEqual({ sizes: [5, 5, 5, 5], label: "4 divisions: 5 + 5 + 5 + 5" });
   });
 
   it("returns nothing for a total with no valid structure", () => {
@@ -25,7 +27,7 @@ describe("nearestAchievableTotals", () => {
   it("excludes the current total and returns achievable neighbors", () => {
     const nearest = nearestAchievableTotals(11);
     expect(nearest).not.toContain(11);
-    expect(nearest.length).toBeGreaterThan(0);
+    expect(nearest).toEqual([10, 12, 14, 16]);
   });
 });
 

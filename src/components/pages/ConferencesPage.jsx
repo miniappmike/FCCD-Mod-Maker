@@ -3,17 +3,8 @@ import { useUniverse } from "../../context/UniverseContext.jsx";
 import { makeDefaultConference } from "../../lib/schema.js";
 import { matchConferenceAsset } from "../../lib/assetSummary.js";
 import { flattenConferenceTeams, averagePrestige, formatAveragePrestige } from "../../lib/teamStats.js";
+import { isValidConferenceStructure } from "../../lib/conferenceStructure.js";
 import StatusPill from "../shared/StatusPill.jsx";
-
-function conferenceIsValid(conf) {
-  const divisions = Array.isArray(conf?.divisions) ? conf.divisions : [];
-  const counts = divisions.map((d) => (Array.isArray(d?.teams) ? d.teams.length : 0));
-  return (
-    (divisions.length === 1 && counts[0] === 10) ||
-    (divisions.length === 2 && counts.every((c) => [6, 7, 9].includes(c))) ||
-    (divisions.length === 4 && counts.every((c) => [4, 5].includes(c)))
-  );
-}
 
 export default function ConferencesPage() {
   const { universe, insertAt, setView, teamPool } = useUniverse();
@@ -66,7 +57,7 @@ export default function ConferencesPage() {
         {conferences.map((conf, cIdx) => {
           const teamCount = (conf.divisions || []).reduce((s, d) => s + (d.teams || []).length, 0);
           const match = matchConferenceAsset(conf.name);
-          const valid = conferenceIsValid(conf);
+          const valid = isValidConferenceStructure(conf.divisions);
           const avgPrestige = averagePrestige(flattenConferenceTeams(conf));
           return (
             <button

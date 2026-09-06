@@ -4,6 +4,7 @@ import { getTeamDisplayName } from "../../lib/schema.js";
 import { countAssetWarnings } from "../../lib/assetSummary.js";
 import { downloadJsonFile, copyJsonToClipboard } from "../../lib/exportUtils.js";
 import { flattenTeams } from "../../lib/teamStats.js";
+import { isValidConferenceStructure } from "../../lib/conferenceStructure.js";
 import StatusPill from "../shared/StatusPill.jsx";
 import StructureAssistant from "./StructureAssistant.jsx";
 import RealignmentGrid from "./RealignmentGrid.jsx";
@@ -100,11 +101,7 @@ function ConferencesStep({ universe, setView, updateField, issueCount, poolCount
           <div className="space-y-2">
             <div className="text-xs font-semibold uppercase tracking-wide text-slate-500">Division structure, once teams are placed</div>
             {conferences.map((conf, cIdx) => {
-              const teamCounts = (conf.divisions || []).map((d) => (d.teams || []).length);
-              const valid =
-                (teamCounts.length === 1 && teamCounts[0] === 10) ||
-                (teamCounts.length === 2 && teamCounts.every((c) => [6, 7, 9].includes(c))) ||
-                (teamCounts.length === 4 && teamCounts.every((c) => [4, 5].includes(c)));
+              const valid = isValidConferenceStructure(conf.divisions);
               return (
                 <div key={cIdx} className="rounded-md border border-slate-700/60 bg-slate-950/50 p-2">
                   <div className="flex items-center justify-between">

@@ -3,6 +3,7 @@ import { useUniverse } from "../../context/UniverseContext.jsx";
 import { makeDefaultDivision, makeDefaultTeam, getTeamDisplayName } from "../../lib/schema.js";
 import { matchConferenceAsset } from "../../lib/assetSummary.js";
 import { flattenConferenceTeams, averagePrestige, formatAveragePrestige } from "../../lib/teamStats.js";
+import { isValidConferenceStructure } from "../../lib/conferenceStructure.js";
 import ZipLocationField from "../shared/ZipLocationField.jsx";
 import AssetThumb from "../shared/AssetThumb.jsx";
 import UploadAssetModal from "../shared/UploadAssetModal.jsx";
@@ -31,10 +32,7 @@ export default function ConferenceEditorPage() {
   const match = matchConferenceAsset(conf.name);
   const divisions = conf.divisions || [];
   const teamCounts = divisions.map((d) => (d.teams || []).length);
-  const structureValid =
-    (divisions.length === 1 && teamCounts[0] === 10) ||
-    (divisions.length === 2 && teamCounts.every((c) => [6, 7, 9].includes(c))) ||
-    (divisions.length === 4 && teamCounts.every((c) => [4, 5].includes(c)));
+  const structureValid = isValidConferenceStructure(divisions);
   const totalTeams = teamCounts.reduce((a, b) => a + b, 0);
   const avgPrestige = averagePrestige(flattenConferenceTeams(conf));
 

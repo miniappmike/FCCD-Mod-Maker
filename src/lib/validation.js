@@ -1,5 +1,7 @@
 /*** Master Validation Function that includes scroll targets. Returns [{ message, targetId, category }]. ***/
 
+import { isValidConferenceStructure } from "./conferenceStructure.js";
+
 export function validateUniverseDetailed(universe) {
   if (!universe) return [];
   const errors = [];
@@ -60,15 +62,8 @@ export function validateUniverseDetailed(universe) {
   conferences.forEach((conf, cIdx) => {
     const confId = `conf-${cIdx}`;
     const divisions = Array.isArray(conf?.divisions) ? conf.divisions : [];
-    const divCount = divisions.length;
-    const teamCounts = divisions.map((d) => (Array.isArray(d?.teams) ? d.teams.length : 0));
 
-    const valid =
-      (divCount === 1 && teamCounts[0] === 10) ||
-      (divCount === 2 && teamCounts.every((c) => [6, 7, 9].includes(c))) ||
-      (divCount === 4 && teamCounts.every((c) => [4, 5].includes(c)));
-
-    if (!valid) {
+    if (!isValidConferenceStructure(divisions)) {
       errors.push({
         message: `Conference '${conf?.name ?? "(unnamed)"}' has an invalid division/team structure.`,
         targetId: confId,
