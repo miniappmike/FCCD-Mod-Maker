@@ -7,6 +7,8 @@ import AdvancedFieldsEditor from "../shared/AdvancedFieldsEditor.jsx";
 import AssetThumb from "../shared/AssetThumb.jsx";
 import UploadAssetModal from "../shared/UploadAssetModal.jsx";
 import ConfirmButton from "../shared/ConfirmButton.jsx";
+import BooleanField from "../shared/BooleanField.jsx";
+import StructureAssistant from "./StructureAssistant.jsx";
 
 export default function ConferenceEditorPage() {
   const { universe, view, setView, updateField, deleteField, removeAt, insertAt } = useUniverse();
@@ -64,7 +66,24 @@ export default function ConferenceEditorPage() {
           <input id="c-prestige" type="number" min={1} max={10} className="w-full rounded-md border border-slate-700 bg-slate-950 px-3 py-2 text-sm text-slate-100" value={conf.prestigeLevel ?? 1} onChange={(e) => updateField(path("prestigeLevel"), parseInt(e.target.value, 10) || 1)} />
         </div>
         <ZipLocationField label="Championship Zip Code" value={conf.zipcode} onChange={(v) => updateField(path("zipcode"), v)} id="c-zip" />
+        <div className="col-span-full flex flex-wrap gap-6 border-t border-slate-800 pt-3">
+          <BooleanField
+            id="c-ccg-indoors"
+            label="CCG Played Indoors"
+            value={conf.playCcgIndoors}
+            onChange={(v) => updateField(path("playCcgIndoors"), v)}
+          />
+          <BooleanField
+            id="c-ccg-home"
+            label="CCG At Higher Seed's Home"
+            description="Play the championship game at the higher seed's home stadium instead of a neutral site."
+            value={conf.playCcgAsHomeGame}
+            onChange={(v) => updateField(path("playCcgAsHomeGame"), v)}
+          />
+        </div>
       </div>
+
+      <StructureAssistant conference={conf} onApply={(divisions) => updateField(path("divisions"), divisions)} />
 
       <div className="rounded-lg border border-slate-800 bg-slate-900/60 p-4">
         <div className="mb-3 flex items-center justify-between">

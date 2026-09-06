@@ -1,11 +1,17 @@
 /*** JSON / immutable-state helpers shared across the editor. ***/
 
 // Immutably set a value at a path inside an object, preserving everything else untouched.
+// Missing intermediate objects (e.g. an award slot a loaded file omitted) are created
+// as empty objects along the way rather than throwing.
 export function setAt(root, path, value) {
   const clone = structuredClone(root);
   if (path.length === 0) return value;
   let obj = clone;
-  for (let i = 0; i < path.length - 1; i++) obj = obj[path[i]];
+  for (let i = 0; i < path.length - 1; i++) {
+    const key = path[i];
+    if (obj[key] == null || typeof obj[key] !== "object") obj[key] = {};
+    obj = obj[key];
+  }
   obj[path[path.length - 1]] = value;
   return clone;
 }

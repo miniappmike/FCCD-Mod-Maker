@@ -1,10 +1,12 @@
-import React, { useRef } from "react";
+import React, { useRef, useState } from "react";
 import { useUniverse } from "../../context/UniverseContext.jsx";
 import { makeBlankUniverse } from "../../lib/schema.js";
+import { loadBaseRosterUniverse } from "../../lib/baseRoster.js";
 
 export default function LandingPage() {
-  const { importJson, startBlankUniverse } = useUniverse();
+  const { importJson, startBlankUniverse, showToast } = useUniverse();
   const fileInputRef = useRef(null);
+  const [loadingRoster, setLoadingRoster] = useState(false);
 
   function handleFile(file) {
     if (!file) return;
@@ -60,6 +62,29 @@ export default function LandingPage() {
         >
           Start a New Blank Universe
         </button>
+
+        <button
+          type="button"
+          disabled={loadingRoster}
+          className="mt-2 w-full rounded-md border border-cyan-500/40 bg-cyan-500/10 py-2.5 text-sm font-medium text-cyan-200 hover:bg-cyan-500/20 disabled:opacity-50"
+          onClick={async () => {
+            setLoadingRoster(true);
+            try {
+              const seeded = await loadBaseRosterUniverse();
+              startBlankUniverse(seeded);
+            } catch {
+              showToast("Could not load the base roster.", "error");
+            } finally {
+              setLoadingRoster(false);
+            }
+          }}
+        >
+          {loadingRoster ? "Loading…" : "Start from Base Roster (realign existing teams)"}
+        </button>
+        <p className="mt-1 text-center text-[11px] text-slate-600">
+          Loads a full 138-team, 10-conference roster so you can drag teams into custom conferences
+          on the Realignment Board instead of building from nothing.
+        </p>
 
         <div className="mt-6 flex items-center justify-between gap-2 text-xs">
           <a

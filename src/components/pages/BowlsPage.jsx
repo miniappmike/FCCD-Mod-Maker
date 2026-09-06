@@ -7,6 +7,7 @@ import AdvancedFieldsEditor from "../shared/AdvancedFieldsEditor.jsx";
 import AssetThumb from "../shared/AssetThumb.jsx";
 import UploadAssetModal from "../shared/UploadAssetModal.jsx";
 import ConfirmButton from "../shared/ConfirmButton.jsx";
+import BooleanField from "../shared/BooleanField.jsx";
 
 function toList(v) {
   if (typeof v === "string") return [v];
@@ -199,6 +200,15 @@ export default function BowlsPage() {
                   />
                 </div>
                 <ZipLocationField value={bowl.zipcode} onChange={(v) => updateField(["bowlGames", i, "zipcode"], v)} />
+              </div>
+
+              <div className="mt-2">
+                <BooleanField
+                  id={`bowl-${i}-indoors`}
+                  label="Indoors"
+                  value={bowl.indoors}
+                  onChange={(v) => updateField(["bowlGames", i, "indoors"], v)}
+                />
               </div>
 
               <TieInEditor bowl={bowl} i={i} conferenceNames={conferenceNames} updateField={updateField} deleteField={deleteField} />
