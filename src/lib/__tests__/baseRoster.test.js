@@ -3,14 +3,12 @@ import { loadBaseRosterUniverse } from "../baseRoster.js";
 import baseRosterRaw from "../../data/baseRoster.json";
 
 describe("loadBaseRosterUniverse", () => {
-  it("returns every conference/division with zero teams", async () => {
+  it("collapses every conference to a single empty division", async () => {
     const { universe } = await loadBaseRosterUniverse();
     expect(universe.conferences.length).toBeGreaterThan(0);
     universe.conferences.forEach((conf) => {
-      expect(conf.divisions.length).toBeGreaterThan(0);
-      conf.divisions.forEach((div) => {
-        expect(div.teams).toEqual([]);
-      });
+      expect(conf.divisions).toHaveLength(1);
+      expect(conf.divisions[0].teams).toEqual([]);
     });
   });
 

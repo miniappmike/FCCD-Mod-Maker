@@ -6,6 +6,7 @@ const NAV_ITEMS = [
   { name: "overview", label: "Overview", icon: "◧" },
   { name: "teams", label: "Teams", icon: "🏈" },
   { name: "conferences", label: "Conferences", icon: "🏆" },
+  { name: "realignment", label: "Realignment", icon: "⇄" },
   { name: "divisions", label: "Divisions", icon: "▤" },
   { name: "bowls", label: "Bowls", icon: "🎗" },
   { name: "rivalries", label: "Rivalries", icon: "⚔" },
@@ -16,7 +17,7 @@ const NAV_ITEMS = [
 ];
 
 export default function Sidebar() {
-  const { view, setView, validation, assetAudit } = useUniverse();
+  const { view, setView, validation, assetAudit, teamPool } = useUniverse();
 
   const assetWarnings = countAssetWarnings(assetAudit);
 
@@ -48,6 +49,7 @@ export default function Sidebar() {
           let badge = null;
           if (item.name === "validation" && validation.length > 0) badge = validation.length;
           if (item.name === "assets" && assetWarnings > 0) badge = assetWarnings;
+          if (item.name === "realignment" && teamPool.length > 0) badge = teamPool.length;
 
           return (
             <li key={item.name}>
