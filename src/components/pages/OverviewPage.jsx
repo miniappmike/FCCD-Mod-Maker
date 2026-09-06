@@ -1,8 +1,6 @@
 import React from "react";
 import { useUniverse } from "../../context/UniverseContext.jsx";
-import { UNIVERSE_KNOWN_KEYS } from "../../lib/schema.js";
 import { countAssetWarnings } from "../../lib/assetSummary.js";
-import AdvancedFieldsEditor from "../shared/AdvancedFieldsEditor.jsx";
 
 function StatCard({ label, value, onClick }) {
   return (
@@ -18,7 +16,7 @@ function StatCard({ label, value, onClick }) {
 }
 
 export default function OverviewPage() {
-  const { universe, updateField, deleteField, setView, validation, assetAudit } = useUniverse();
+  const { universe, updateField, setView, validation, assetAudit } = useUniverse();
 
   const teamCount = (universe.conferences || []).reduce(
     (sum, c) => sum + (c.divisions || []).reduce((s2, d) => s2 + (d.teams || []).length, 0),
@@ -97,13 +95,6 @@ export default function OverviewPage() {
           </li>
         </ul>
       </div>
-
-      <AdvancedFieldsEditor
-        entity={universe}
-        knownKeys={UNIVERSE_KNOWN_KEYS}
-        onSet={(key, val) => updateField([key], val)}
-        onDelete={(key) => deleteField([key])}
-      />
     </div>
   );
 }

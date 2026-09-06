@@ -1,9 +1,8 @@
 import React, { useState } from "react";
 import { useUniverse } from "../../context/UniverseContext.jsx";
-import { CONFERENCE_KNOWN_KEYS, DIVISION_KNOWN_KEYS, makeDefaultDivision, makeDefaultTeam, getTeamDisplayName } from "../../lib/schema.js";
+import { makeDefaultDivision, makeDefaultTeam, getTeamDisplayName } from "../../lib/schema.js";
 import { matchConferenceAsset } from "../../lib/assetSummary.js";
 import ZipLocationField from "../shared/ZipLocationField.jsx";
-import AdvancedFieldsEditor from "../shared/AdvancedFieldsEditor.jsx";
 import AssetThumb from "../shared/AssetThumb.jsx";
 import UploadAssetModal from "../shared/UploadAssetModal.jsx";
 import ConfirmButton from "../shared/ConfirmButton.jsx";
@@ -11,7 +10,7 @@ import BooleanField from "../shared/BooleanField.jsx";
 import StructureAssistant from "./StructureAssistant.jsx";
 
 export default function ConferenceEditorPage() {
-  const { universe, view, setView, updateField, deleteField, removeAt, insertAt } = useUniverse();
+  const { universe, view, setView, updateField, removeAt, insertAt } = useUniverse();
   const { cIdx } = view.params;
   const conf = universe.conferences?.[cIdx];
   const [uploadOpen, setUploadOpen] = useState(false);
@@ -137,26 +136,11 @@ export default function ConferenceEditorPage() {
                   ))
                 )}
               </ul>
-
-              <AdvancedFieldsEditor
-                entity={div}
-                knownKeys={DIVISION_KNOWN_KEYS}
-                title="Advanced Division Fields"
-                onSet={(key, val) => updateField(["conferences", cIdx, "divisions", dIdx, key], val)}
-                onDelete={(key) => deleteField(["conferences", cIdx, "divisions", dIdx, key])}
-              />
             </div>
           ))}
           {divisions.length === 0 ? <div className="text-sm text-slate-500">No divisions yet.</div> : null}
         </div>
       </div>
-
-      <AdvancedFieldsEditor
-        entity={conf}
-        knownKeys={CONFERENCE_KNOWN_KEYS}
-        onSet={(key, val) => updateField(path(key), val)}
-        onDelete={(key) => deleteField(path(key))}
-      />
 
       <div className="flex justify-end border-t border-slate-800 pt-4">
         <ConfirmButton

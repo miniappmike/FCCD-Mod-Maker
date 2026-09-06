@@ -1,9 +1,8 @@
 import React, { useState } from "react";
 import { useUniverse } from "../../context/UniverseContext.jsx";
-import { BOWL_KNOWN_KEYS, makeDefaultBowl } from "../../lib/schema.js";
+import { makeDefaultBowl } from "../../lib/schema.js";
 import { matchBowlAsset } from "../../lib/assetSummary.js";
 import ZipLocationField from "../shared/ZipLocationField.jsx";
-import AdvancedFieldsEditor from "../shared/AdvancedFieldsEditor.jsx";
 import AssetThumb from "../shared/AssetThumb.jsx";
 import UploadAssetModal from "../shared/UploadAssetModal.jsx";
 import ConfirmButton from "../shared/ConfirmButton.jsx";
@@ -212,15 +211,6 @@ export default function BowlsPage() {
               </div>
 
               <TieInEditor bowl={bowl} i={i} conferenceNames={conferenceNames} updateField={updateField} deleteField={deleteField} />
-
-              <div className="mt-3">
-                <AdvancedFieldsEditor
-                  entity={bowl}
-                  knownKeys={BOWL_KNOWN_KEYS}
-                  onSet={(key, val) => updateField(["bowlGames", i, key], val)}
-                  onDelete={(key) => deleteField(["bowlGames", i, key])}
-                />
-              </div>
             </div>
           );
         })}

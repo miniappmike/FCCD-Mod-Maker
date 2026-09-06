@@ -114,12 +114,3 @@ export function safeJsonParse(text) {
     };
   }
 }
-
-export function getUnknownEntries(obj, knownKeys) {
-  if (!obj || typeof obj !== "object" || Array.isArray(obj)) return [];
-  return Object.entries(obj).filter(([k]) => !knownKeys.has(k));
-}
-
-export function isPlainObject(v) {
-  return v !== null && typeof v === "object" && !Array.isArray(v);
-}
