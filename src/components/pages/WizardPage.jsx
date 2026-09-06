@@ -5,6 +5,7 @@ import { countAssetWarnings } from "../../lib/assetSummary.js";
 import { downloadJsonFile, copyJsonToClipboard } from "../../lib/exportUtils.js";
 import StatusPill from "../shared/StatusPill.jsx";
 import StructureAssistant from "./StructureAssistant.jsx";
+import RealignmentGrid from "./RealignmentGrid.jsx";
 
 function flattenTeams(universe) {
   const rows = [];
@@ -74,40 +75,64 @@ function ConferencesStep({ universe, setView, updateField, issueCount, poolCount
   const conferences = universe.conferences || [];
   return (
     <StepShell
-      title="Conferences & Divisions"
-      description="Exactly 6, 8, or 10 conferences; each conference needs 1×10, 2×[6/7/9], or 4×[4/5] divisions."
+      title="Team Realignment"
+      description="Get every team into a conference first — nothing else in this wizard is meaningful until teams are placed. Drag from the pool below, then use each conference's structure suggestion once its team count is set."
       issueCount={issueCount}
     >
-      <div className="flex flex-wrap gap-2">
-        <button type="button" className="rounded-md border border-slate-700 px-3 py-1.5 text-xs text-slate-300 hover:bg-slate-800" onClick={() => setView("conferences")}>
-          Open Conferences
-        </button>
-        <button type="button" className="rounded-md border border-slate-700 px-3 py-1.5 text-xs text-slate-300 hover:bg-slate-800" onClick={() => setView("realignment")}>
-          Open Realignment Board
-        </button>
-      </div>
-      {poolCount > 0 ? (
-        <div className="text-xs text-amber-400">{poolCount} team(s) still waiting in the pool, unassigned to any conference.</div>
-      ) : null}
-      <div className="space-y-2">
-        {conferences.map((conf, cIdx) => {
-          const teamCounts = (conf.divisions || []).map((d) => (d.teams || []).length);
-          const valid =
-            (teamCounts.length === 1 && teamCounts[0] === 10) ||
-            (teamCounts.length === 2 && teamCounts.every((c) => [6, 7, 9].includes(c))) ||
-            (teamCounts.length === 4 && teamCounts.every((c) => [4, 5].includes(c)));
-          return (
-            <div key={cIdx} className="rounded-md border border-slate-700/60 bg-slate-950/50 p-2">
-              <div className="flex items-center justify-between">
-                <span className="text-sm text-slate-200">{conf.name || `Conference #${cIdx + 1}`}</span>
-                <StatusPill status={valid ? "success" : "error"}>{valid ? "Valid" : "Invalid"}</StatusPill>
-              </div>
-              {!valid ? <div className="mt-2"><StructureAssistant conference={conf} onApply={(divisions) => updateField(["conferences", cIdx, "divisions"], divisions)} /></div> : null}
-            </div>
-          );
-        })}
-        {conferences.length === 0 ? <div className="text-sm text-slate-500">No conferences yet — add some from the Conferences page.</div> : null}
-      </div>
+      {conferences.length === 0 ? (
+        <div className="text-sm text-slate-500">
+          No conferences yet —{" "}
+          <button type="button" className="text-cyan-400 underline" onClick={() => setView("conferences")}>
+            add some on the Conferences page
+          </button>{" "}
+          before realigning teams.
+        </div>
+      ) : (
+        <>
+          {poolCount > 0 ? (
+            <div className="text-xs text-amber-400">{poolCount} team(s) still waiting in the pool, unassigned to any conference.</div>
+          ) : (
+            <div className="text-xs text-emerald-400">✓ No teams left in the pool.</div>
+          )}
+
+          <div className="rounded-lg border border-slate-800 bg-slate-950/40 p-3">
+            <RealignmentGrid heightClassName="h-[420px]" />
+          </div>
+
+          <div className="flex flex-wrap gap-2">
+            <button type="button" className="rounded-md border border-slate-700 px-3 py-1.5 text-xs text-slate-300 hover:bg-slate-800" onClick={() => setView("realignment")}>
+              Open Full-Screen Realignment Board
+            </button>
+            <button type="button" className="rounded-md border border-slate-700 px-3 py-1.5 text-xs text-slate-300 hover:bg-slate-800" onClick={() => setView("conferences")}>
+              Open Conferences
+            </button>
+          </div>
+
+          <div className="space-y-2">
+            <div className="text-xs font-semibold uppercase tracking-wide text-slate-500">Division structure, once teams are placed</div>
+            {conferences.map((conf, cIdx) => {
+              const teamCounts = (conf.divisions || []).map((d) => (d.teams || []).length);
+              const valid =
+                (teamCounts.length === 1 && teamCounts[0] === 10) ||
+                (teamCounts.length === 2 && teamCounts.every((c) => [6, 7, 9].includes(c))) ||
+                (teamCounts.length === 4 && teamCounts.every((c) => [4, 5].includes(c)));
+              return (
+                <div key={cIdx} className="rounded-md border border-slate-700/60 bg-slate-950/50 p-2">
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm text-slate-200">{conf.name || `Conference #${cIdx + 1}`}</span>
+                    <StatusPill status={valid ? "success" : "error"}>{valid ? "Valid" : "Invalid"}</StatusPill>
+                  </div>
+                  {!valid ? (
+                    <div className="mt-2">
+                      <StructureAssistant conference={conf} onApply={(divisions) => updateField(["conferences", cIdx, "divisions"], divisions)} />
+                    </div>
+                  ) : null}
+                </div>
+              );
+            })}
+          </div>
+        </>
+      )}
     </StepShell>
   );
 }
@@ -267,7 +292,7 @@ function SummaryStep({ universe, validation, assetAudit, rows }) {
 const STEPS = ["basics", "conferences", "rivalries", "bowls", "league", "summary"];
 const STEP_LABELS = {
   basics: "Basics",
-  conferences: "Conferences",
+  conferences: "Realign",
   rivalries: "Rivalries",
   bowls: "Bowls",
   league: "League",
@@ -283,7 +308,7 @@ export default function WizardPage() {
   const issuesByCategory = (cats) => validation.filter((e) => cats.includes(e.category)).length;
   const issueCounts = {
     basics: issuesByCategory(["structure"]),
-    conferences: issuesByCategory(["conferences", "divisions"]),
+    conferences: issuesByCategory(["conferences", "divisions"]) + teamPool.length,
     rivalries: issuesByCategory(["rivals"]),
     bowls: validation.filter((e) => e.category === "bowls" || (e.category === "zip" && e.targetId?.startsWith("bowl-"))).length,
     league: validation.filter((e) => e.targetId === "section-league-settings").length,
@@ -291,7 +316,7 @@ export default function WizardPage() {
   };
 
   return (
-    <div className="mx-auto max-w-3xl space-y-6 p-6">
+    <div className="mx-auto max-w-5xl space-y-6 p-6">
       <div>
         <h2 className="text-lg font-semibold text-slate-100">Setup Wizard</h2>
         <p className="text-sm text-slate-500">A guided walkthrough so nothing gets missed while building a custom universe.</p>
